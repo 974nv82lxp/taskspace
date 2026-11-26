@@ -1,0 +1,940 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TaskSpace stock technical analysis, trading signals, RSI alerts, support and resistance.">
+    <title>Technical Analysis — TaskSpace</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/stocks.css">
+
+    <style>
+        .ta-page { padding-bottom: 40px; }
+        .ta-nav { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:12px; }
+        .ta-nav a { text-decoration:none; }
+        .ta-nav-current { border:1px solid #8b7cff; border-radius:8px; padding:8px 12px; color:#c7bdff; }
+        .ta-search { display:flex; align-items:end; gap:12px; flex-wrap:wrap; }
+        .ta-search label { display:block; margin-bottom:6px; }
+        .ta-search input { width:180px; max-width:100%; padding:10px 12px; border-radius:8px; border:1px solid #475569; background:#0b1120; color:inherit; }
+        .ta-message { min-height:1.5em; overflow-wrap:anywhere; }
+        .ta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+        .ta-card { min-width:0; padding:18px; border:1px solid rgba(139,124,255,.22); border-radius:12px; background:rgba(139,124,255,.045); }
+        .ta-card h3 { margin:0 0 12px; font-size:.95rem; }
+        .ta-value { display:block; margin-bottom:8px; font-size:1.45rem; font-weight:700; overflow-wrap:anywhere; }
+        .ta-muted { opacity:.78; font-size:.9rem; }
+        .ta-chart-wrap { width:100%; min-height:280px; }
+        .ta-chart { display:block; width:100%; height:280px; }
+        .ta-table-wrap { width:100%; overflow-x:auto; }
+        .ta-table { width:100%; border-collapse:collapse; text-align:left; }
+        .ta-table th,.ta-table td { padding:10px 12px; border-bottom:1px solid rgba(148,163,184,.2); white-space:nowrap; }
+        .ta-positive { color:#34d399; }
+        .ta-negative { color:#fb7185; }
+        .ta-neutral { color:#fbbf24; }
+        .ta-pill { display:inline-block; border:1px solid currentColor; border-radius:999px; padding:5px 10px; font-size:.82rem; font-weight:700; }
+        .ta-bull { color:#34d399; }
+        .ta-bear { color:#fb7185; }
+        .ta-warn { color:#fbbf24; }
+        .ta-list { padding-left:20px; }
+        .ta-list li { margin-bottom:9px; }
+        .ta-signal-score { height:10px; background:#334155; border-radius:99px; overflow:hidden; margin:12px 0; }
+        .ta-signal-score > div { height:100%; width:50%; background:#8b7cff; transition:width .2s; }
+        .ta-alert { padding:12px 14px; border-radius:8px; margin:8px 0; border:1px solid rgba(148,163,184,.25); }
+        .ta-alert[data-level="warning"] { border-color:#fbbf24; }
+        .ta-alert[data-level="positive"] { border-color:#34d399; }
+        .ta-alert[data-level="negative"] { border-color:#fb7185; }
+        .ta-disclaimer { font-size:.9rem; opacity:.8; }
+        @media(max-width:600px) {
+            .ta-nav { justify-content:flex-start; }
+            .ta-search { align-items:stretch; }
+            .ta-search input,.ta-search > div,.ta-search button { width:100%; }
+        }
+    </style>
+</head>
+
+<body>
+<header class="topbar">
+    <a class="brand" href="/" aria-label="TaskSpace home">
+        <span class="brand-icon">T</span><span>TaskSpace</span>
+    </a>
+    <nav class="ta-nav" aria-label="Stock analysis navigation">
+        <a href="/" class="stocks-home-link">Back to workspace</a>
+        <a href="/stocks" class="stocks-nav-button">📊 Stock Dashboard</a>
+        <span class="ta-nav-current" aria-current="page">📈 Technical Analysis</span>
+    </nav>
+</header>
+
+<main class="page-container stocks-page ta-page">
+    <section class="page-heading">
+        <h1>Technical Analysis</h1>
+        <p>Technical signals, trend detection, support and resistance, and indicator alerts.</p>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Choose a stock</h2>
+        <form id="ta-search-form" class="ta-search">
+            <div>
+                <label for="ta-symbol">Ticker symbol</label>
+                <input id="ta-symbol" name="symbol" type="text" value="AAPL"
+                    placeholder="e.g. AAPL" maxlength="20" autocomplete="off" required>
+            </div>
+            <button id="ta-analyze-button" type="submit">Analyze</button>
+        </form>
+        <p id="ta-message" class="ta-message" role="status" aria-live="polite">Loading stock data…</p>
+    </section>
+
+    <section class="panel stock-section">
+        <h2 id="ta-company-name">Company overview</h2>
+        <p id="ta-company-details" class="ta-muted">Company information will appear here.</p>
+        <div class="ta-grid">
+            <article class="ta-card">
+                <h3>Latest price</h3><strong id="ta-price" class="ta-value">—</strong>
+                <span class="ta-muted">Reported by the stock API</span>
+            </article>
+            <article class="ta-card">
+                <h3>Daily change</h3><strong id="ta-change" class="ta-value">—</strong>
+                <span id="ta-change-percent" class="ta-muted">—</span>
+            </article>
+            <article class="ta-card">
+                <h3>Day's range</h3><strong id="ta-day-range" class="ta-value">—</strong>
+                <span class="ta-muted">Reported high and low</span>
+            </article>
+            <article class="ta-card">
+                <h3>Previous close</h3><strong id="ta-previous-close" class="ta-value">—</strong>
+                <span class="ta-muted">Previous trading session</span>
+            </article>
+        </div>
+        <p id="ta-data-status" class="ta-muted"></p>
+    </section>
+
+    <section class="panel stock-section" id="ta-signals">
+        <h2>Technical signal summary</h2>
+        <p class="ta-muted">A rule-based interpretation of the available indicators, not a prediction.</p>
+        <div class="ta-grid">
+            <article class="ta-card">
+                <h3>Combined signal</h3>
+                <strong id="ta-signal" class="ta-value">—</strong>
+                <span id="ta-signal-summary" class="ta-muted">Waiting for indicators.</span>
+            </article>
+            <article class="ta-card">
+                <h3>Technical score</h3>
+                <strong id="ta-score" class="ta-value">—</strong>
+                <div class="ta-signal-score" aria-label="Technical score bar">
+                    <div id="ta-score-bar"></div>
+                </div>
+                <span class="ta-muted">Range: −100 to +100</span>
+            </article>
+            <article class="ta-card">
+                <h3>Detected trend</h3>
+                <strong id="ta-trend" class="ta-value">—</strong>
+                <span id="ta-trend-details" class="ta-muted">Waiting for price history.</span>
+            </article>
+            <article class="ta-card">
+                <h3>Signal confidence</h3>
+                <strong id="ta-agreement" class="ta-value">—</strong>
+                <span class="ta-muted">Agreement among available rules; not a probability of profit.</span>
+            </article>
+        </div>
+        <h3>Why this signal?</h3>
+        <ul id="ta-signal-reasons" class="ta-list">
+            <li>Waiting for stock data.</li>
+        </ul>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Support and resistance</h2>
+        <p class="ta-muted">Estimated from recent historical highs and lows. These levels are approximate, not guaranteed turning points.</p>
+        <div class="ta-grid">
+            <article class="ta-card">
+                <h3>Nearest estimated support</h3>
+                <strong id="ta-support" class="ta-value">—</strong>
+                <span id="ta-support-distance" class="ta-muted">Waiting for data.</span>
+            </article>
+            <article class="ta-card">
+                <h3>Nearest estimated resistance</h3>
+                <strong id="ta-resistance" class="ta-value">—</strong>
+                <span id="ta-resistance-distance" class="ta-muted">Waiting for data.</span>
+            </article>
+            <article class="ta-card">
+                <h3>Price position</h3>
+                <strong id="ta-price-position" class="ta-value">—</strong>
+                <span class="ta-muted">Relative to estimated support and resistance</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Indicator alerts</h2>
+        <div id="ta-alerts" aria-live="polite">
+            <p class="ta-muted">Waiting for indicator data.</p>
+        </div>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Historical closing prices</h2>
+        <div class="ta-chart-wrap">
+            <canvas id="ta-price-chart" class="ta-chart" role="img" aria-label="Historical closing price chart"></canvas>
+        </div>
+        <p id="ta-price-chart-message" class="ta-muted">Waiting for price history.</p>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Momentum and trend indicators</h2>
+        <div class="ta-grid">
+            <article class="ta-card">
+                <h3>RSI (14)</h3><strong id="ta-rsi" class="ta-value">—</strong>
+                <span id="ta-rsi-interpretation" class="ta-muted">Relative Strength Index</span>
+            </article>
+            <article class="ta-card">
+                <h3>SMA (20)</h3><strong id="ta-sma20" class="ta-value">—</strong>
+                <span class="ta-muted">20-period simple moving average</span>
+            </article>
+            <article class="ta-card">
+                <h3>SMA (50)</h3><strong id="ta-sma50" class="ta-value">—</strong>
+                <span class="ta-muted">50-period simple moving average</span>
+            </article>
+            <article class="ta-card">
+                <h3>EMA (20)</h3><strong id="ta-ema20" class="ta-value">—</strong>
+                <span class="ta-muted">20-period exponential moving average</span>
+            </article>
+            <article class="ta-card">
+                <h3>MACD</h3><strong id="ta-macd" class="ta-value">—</strong>
+                <span class="ta-muted">MACD line</span>
+            </article>
+            <article class="ta-card">
+                <h3>MACD signal</h3><strong id="ta-macd-signal" class="ta-value">—</strong>
+                <span class="ta-muted">Signal line</span>
+            </article>
+            <article class="ta-card">
+                <h3>MACD histogram</h3><strong id="ta-macd-histogram" class="ta-value">—</strong>
+                <span class="ta-muted">MACD minus signal</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Trading volume</h2>
+        <div class="ta-chart-wrap">
+            <canvas id="ta-volume-chart" class="ta-chart" role="img" aria-label="Historical trading volume chart"></canvas>
+        </div>
+        <p id="ta-volume-message" class="ta-muted">Waiting for trading volume.</p>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>Recent trading sessions</h2>
+        <div class="ta-table-wrap">
+            <table class="ta-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th><th scope="col">Open</th>
+                        <th scope="col">High</th><th scope="col">Low</th>
+                        <th scope="col">Close</th><th scope="col">Volume</th>
+                    </tr>
+                </thead>
+                <tbody id="ta-history-body">
+                    <tr><td colspan="6">No price history loaded.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel stock-section">
+        <h2>How the analysis works</h2>
+        <ul class="ta-list">
+            <li><strong>Combined signal:</strong> available RSI, moving-average and MACD rules contribute bullish or bearish points. Missing indicators are excluded.</li>
+            <li><strong>Trend:</strong> compares recent price action and available moving averages. Mixed or insufficient evidence is shown as sideways/unclear.</li>
+            <li><strong>Support and resistance:</strong> uses local swing lows and highs from the available historical candles.</li>
+            <li><strong>RSI alerts:</strong> RSI at or above 70 is often described as overbought; at or below 30 is often described as oversold. Neither guarantees a reversal.</li>
+            <li><strong>MACD:</strong> the relationship between the MACD line and its signal line helps describe momentum.</li>
+        </ul>
+        <p class="ta-disclaimer">
+            This page provides informational technical analysis, not investment advice.
+            Signals are based on historical data, can lag or conflict, and do not guarantee
+            future performance or profitable trades. Always consider risk, costs and other information.
+        </p>
+    </section>
+</main>
+
+<script>
+"use strict";
+
+const form = document.getElementById("ta-search-form");
+const symbolInput = document.getElementById("ta-symbol");
+const analyzeButton = document.getElementById("ta-analyze-button");
+const message = document.getElementById("ta-message");
+
+let currentCurrency = "USD";
+let activeRequest = 0;
+let lastStockData = null;
+let resizeTimeout;
+
+function el(id) {
+    return document.getElementById(id);
+}
+
+function setText(id, value) {
+    el(id).textContent = value;
+}
+
+function num(value) {
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function fmtPrice(value) {
+    const n = num(value);
+    if (n === null) return "Unavailable";
+
+    try {
+        return new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: currentCurrency,
+            maximumFractionDigits: 2
+        }).format(n);
+    } catch {
+        return `${n.toFixed(2)} ${currentCurrency}`;
+    }
+}
+
+function fmtNum(value, digits = 2) {
+    const n = num(value);
+    return n === null ? "Unavailable" : n.toLocaleString(undefined, {
+        maximumFractionDigits: digits
+    });
+}
+
+function fmtVolume(value) {
+    const n = num(value);
+    return n === null ? "—" : new Intl.NumberFormat(undefined, {
+        notation: "compact",
+        maximumFractionDigits: 2
+    }).format(n);
+}
+
+function fmtDate(value) {
+    if (typeof value !== "string") return "—";
+    const date = new Date(`${value}T00:00:00Z`);
+    return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat(undefined, {
+        year: "numeric", month: "short", day: "numeric", timeZone: "UTC"
+    }).format(date);
+}
+
+function clearIndicatorDisplays() {
+    [
+        "ta-rsi", "ta-sma20", "ta-sma50", "ta-ema20",
+        "ta-macd", "ta-macd-signal", "ta-macd-histogram"
+    ].forEach((id) => setText(id, "—"));
+
+    setText("ta-rsi-interpretation", "Waiting for data.");
+    setText("ta-signal", "—");
+    setText("ta-score", "—");
+    setText("ta-signal-summary", "Waiting for indicators.");
+    setText("ta-trend", "—");
+    setText("ta-trend-details", "Waiting for data.");
+    setText("ta-agreement", "—");
+    setText("ta-support", "—");
+    setText("ta-resistance", "—");
+    setText("ta-support-distance", "Waiting for data.");
+    setText("ta-resistance-distance", "Waiting for data.");
+    setText("ta-price-position", "—");
+    el("ta-signal-reasons").replaceChildren();
+    el("ta-alerts").replaceChildren();
+}
+
+function clearCanvas(id, text) {
+    const canvas = el(id);
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (id === "ta-price-chart") setText("ta-price-chart-message", text);
+    else setText("ta-volume-message", text);
+}
+
+function drawLineChart(canvasId, points, options = {}) {
+    const canvas = el(canvasId);
+    const context = canvas.getContext("2d");
+    const width = Math.max(280, Math.floor(canvas.getBoundingClientRect().width));
+    const height = 280;
+    const ratio = Math.max(1, window.devicePixelRatio || 1);
+
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.height = `${height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+
+    const valid = points.filter((p) => num(p.value) !== null);
+
+    if (!valid.length) {
+        context.fillStyle = "#94a3b8";
+        context.font = "14px sans-serif";
+        context.fillText("No chart data available.", 12, 30);
+        return;
+    }
+
+    const left = 68;
+    const right = width - 16;
+    const top = 20;
+    const bottom = height - 35;
+    const plotWidth = right - left;
+    const plotHeight = bottom - top;
+
+    let minimum = Math.min(...valid.map((p) => p.value));
+    let maximum = Math.max(...valid.map((p) => p.value));
+
+    if (minimum === maximum) {
+        const pad = Math.abs(minimum) * .05 || 1;
+        minimum -= pad;
+        maximum += pad;
+    } else {
+        const pad = (maximum - minimum) * .08;
+        minimum -= pad;
+        maximum += pad;
+    }
+
+    context.font = "11px sans-serif";
+    context.textBaseline = "middle";
+
+    for (let i = 0; i <= 4; i++) {
+        const fraction = i / 4;
+        const y = top + fraction * plotHeight;
+        const value = maximum - fraction * (maximum - minimum);
+
+        context.beginPath();
+        context.strokeStyle = "rgba(148,163,184,.2)";
+        context.moveTo(left, y);
+        context.lineTo(right, y);
+        context.stroke();
+
+        context.fillStyle = "#94a3b8";
+        context.textAlign = "right";
+        context.fillText(fmtNum(value, 2), left - 8, y);
+    }
+
+    const x = (i) => valid.length === 1
+        ? left + plotWidth / 2
+        : left + i / (valid.length - 1) * plotWidth;
+
+    const y = (v) => bottom - (v - minimum) / (maximum - minimum) * plotHeight;
+
+    if (options.bars) {
+        const barWidth = Math.max(1, plotWidth / valid.length * .7);
+        valid.forEach((point, i) => {
+            const barHeight = Math.max(0, bottom - y(point.value));
+            context.fillStyle = options.color || "#34d399";
+            context.fillRect(x(i) - barWidth / 2, bottom - barHeight, barWidth, barHeight);
+        });
+    } else {
+        context.beginPath();
+        valid.forEach((point, i) => {
+            if (i === 0) context.moveTo(x(i), y(point.value));
+            else context.lineTo(x(i), y(point.value));
+        });
+        context.strokeStyle = options.color || "#8b7cff";
+        context.lineWidth = 2;
+        context.stroke();
+    }
+
+    context.fillStyle = "#94a3b8";
+    context.textBaseline = "top";
+    context.textAlign = "left";
+    context.fillText(valid[0].label || "", left, bottom + 10);
+    context.textAlign = "right";
+    context.fillText(valid[valid.length - 1].label || "", right, bottom + 10);
+}
+
+function renderHistory(history) {
+    const tbody = el("ta-history-body");
+    tbody.replaceChildren();
+
+    const rows = history.slice(-15).reverse();
+
+    if (!rows.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 6;
+        td.textContent = "No historical prices are available.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+    }
+
+    rows.forEach((item) => {
+        const tr = document.createElement("tr");
+        [
+            fmtDate(item.date),
+            fmtPrice(item.open),
+            fmtPrice(item.high),
+            fmtPrice(item.low),
+            fmtPrice(item.close),
+            fmtVolume(item.volume)
+        ].forEach((value) => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+/* Use only the indicator fields returned by the existing stock API. */
+function getIndicatorValues(data) {
+    const indicators = data.indicators || {};
+    const macd = indicators.macd || {};
+
+    return {
+        rsi: num(indicators.rsi14),
+        sma20: num(indicators.sma20),
+        sma50: num(indicators.sma50),
+        ema20: num(indicators.ema20),
+        macd: num(macd.macd),
+        signal: num(macd.signal),
+        histogram: num(macd.histogram)
+    };
+}
+
+function addListItem(list, text, className) {
+    const li = document.createElement("li");
+    li.textContent = text;
+    if (className) li.className = className;
+    list.appendChild(li);
+}
+
+function calculateSignal(data) {
+    const v = getIndicatorValues(data);
+    const quote = data.quote || {};
+    const history = Array.isArray(data.history) ? data.history : [];
+    const price = num(quote.current) ??
+        (history.length ? num(history[history.length - 1].close) : null);
+
+    let score = 0;
+    let possibleWeight = 0;
+    let bullishRules = 0;
+    let bearishRules = 0;
+    const reasons = [];
+
+    function rule(name, weight, bullish, explanation) {
+        possibleWeight += weight;
+        score += bullish ? weight : -weight;
+        if (bullish) bullishRules++;
+        else bearishRules++;
+        reasons.push(`${name}: ${explanation}`);
+    }
+
+    if (v.rsi !== null) {
+        if (v.rsi < 30) {
+            possibleWeight += 2;
+            score += 1;
+            reasons.push("RSI: oversold reading; this can precede a bounce but may persist in a downtrend.");
+        } else if (v.rsi > 70) {
+            possibleWeight += 2;
+            score -= 1;
+            reasons.push("RSI: overbought reading; momentum may be stretched, but strong uptrends can remain overbought.");
+        } else if (v.rsi >= 50) {
+            rule("RSI", 2, true, `RSI ${v.rsi.toFixed(1)} is at or above 50.`);
+        } else {
+            rule("RSI", 2, false, `RSI ${v.rsi.toFixed(1)} is below 50.`);
+        }
+    } else {
+        reasons.push("RSI: unavailable; excluded from the score.");
+    }
+
+    if (price !== null && v.sma20 !== null) {
+        rule("Price vs SMA20", 2, price >= v.sma20,
+            `price ${price >= v.sma20 ? "is above or equal to" : "is below"} SMA20.`);
+    } else reasons.push("Price vs SMA20: insufficient data.");
+
+    if (v.sma20 !== null && v.sma50 !== null) {
+        rule("SMA20 vs SMA50", 2, v.sma20 >= v.sma50,
+            `SMA20 is ${v.sma20 >= v.sma50 ? "above or equal to" : "below"} SMA50.`);
+    } else reasons.push("SMA20 vs SMA50: insufficient data.");
+
+    if (price !== null && v.ema20 !== null) {
+        rule("Price vs EMA20", 1, price >= v.ema20,
+            `price ${price >= v.ema20 ? "is above or equal to" : "is below"} EMA20.`);
+    } else reasons.push("Price vs EMA20: insufficient data.");
+
+    if (v.macd !== null && v.signal !== null) {
+        rule("MACD", 2, v.macd >= v.signal,
+            `MACD is ${v.macd >= v.signal ? "above or equal to" : "below"} its signal line.`);
+    } else reasons.push("MACD: insufficient data.");
+
+    if (v.histogram !== null) {
+        rule("MACD histogram", 1, v.histogram >= 0,
+            `histogram is ${v.histogram >= 0 ? "non-negative" : "negative"}.`);
+    } else reasons.push("MACD histogram: unavailable.");
+
+    const normalized = possibleWeight ? Math.round(score / possibleWeight * 100) : null;
+    let signal = "HOLD";
+    let tone = "ta-warn";
+    let summary = "Mixed or insufficient evidence. Consider waiting for clearer confirmation.";
+
+    if (normalized !== null && normalized >= 35) {
+        signal = "BUY BIAS";
+        tone = "ta-bull";
+        summary = "The available rules lean bullish. This is not a recommendation or a guarantee.";
+    } else if (normalized !== null && normalized <= -35) {
+        signal = "SELL BIAS";
+        tone = "ta-bear";
+        summary = "The available rules lean bearish. This is not a recommendation or a guarantee.";
+    } else if (normalized === null) {
+        summary = "Not enough indicator data to calculate a meaningful score.";
+    }
+
+    const agreementTotal = bullishRules + bearishRules;
+    const agreement = agreementTotal
+        ? `${Math.round(Math.max(bullishRules, bearishRules) / agreementTotal * 100)}% rule agreement`
+        : "Insufficient data";
+
+    return { signal, tone, summary, score: normalized, reasons, agreement, price, indicators: v };
+}
+
+/* Approximate levels from local swing highs and lows in the available history. */
+function findSupportResistance(history, price) {
+    const candles = history.filter((c) =>
+        num(c.high) !== null && num(c.low) !== null && num(c.close) !== null
+    );
+
+    if (candles.length < 5 || price === null) {
+        return { support: null, resistance: null, position: "Insufficient data" };
+    }
+
+    const recent = candles.slice(-100);
+    const lows = [];
+    const highs = [];
+
+    for (let i = 1; i < recent.length - 1; i++) {
+        const low = num(recent[i].low);
+        const high = num(recent[i].high);
+
+        if (low <= num(recent[i - 1].low) && low <= num(recent[i + 1].low)) {
+            lows.push(low);
+        }
+        if (high >= num(recent[i - 1].high) && high >= num(recent[i + 1].high)) {
+            highs.push(high);
+        }
+    }
+
+    const supports = lows.filter((level) => level <= price).sort((a, b) => b - a);
+    const resistances = highs.filter((level) => level >= price).sort((a, b) => a - b);
+
+    /* Fall back to historical extremes if no local swing is on the expected side. */
+    const support = supports[0] ??
+        Math.min(...recent.map((c) => c.low));
+    const resistance = resistances[0] ??
+        Math.max(...recent.map((c) => c.high));
+
+    let position = "Between levels";
+    if (price < support) position = "Below support";
+    else if (price > resistance) position = "Above resistance";
+    else if (resistance > support) {
+        const relative = (price - support) / (resistance - support);
+        if (relative < .25) position = "Near support";
+        else if (relative > .75) position = "Near resistance";
+    }
+
+    return { support, resistance, position };
+}
+
+function detectTrend(data) {
+    const history = Array.isArray(data.history) ? data.history : [];
+    const closes = history.map((c) => num(c.close)).filter((v) => v !== null);
+    const v = getIndicatorValues(data);
+    const quote = data.quote || {};
+    const price = num(quote.current) ?? (closes.length ? closes[closes.length - 1] : null);
+
+    if (closes.length < 20 || price === null) {
+        return { label: "Unclear", tone: "ta-warn", detail: "Not enough historical data." };
+    }
+
+    const recent = closes.slice(-20);
+    const first = recent[0];
+    const last = recent[recent.length - 1];
+    const change = first !== 0 ? (last - first) / Math.abs(first) * 100 : 0;
+
+    let votes = 0;
+    let count = 0;
+
+    if (v.sma20 !== null) { votes += price >= v.sma20 ? 1 : -1; count++; }
+    if (v.sma50 !== null) { votes += price >= v.sma50 ? 1 : -1; count++; }
+    if (v.sma20 !== null && v.sma50 !== null) {
+        votes += v.sma20 >= v.sma50 ? 1 : -1;
+        count++;
+    }
+
+    if (change > 1) votes++;
+    else if (change < -1) votes--;
+    count++;
+
+    if (count && votes >= 2) {
+        return { label: "Bullish", tone: "ta-bull", detail: `Recent 20-session price change: ${change.toFixed(2)}%.` };
+    }
+    if (count && votes <= -2) {
+        return { label: "Bearish", tone: "ta-bear", detail: `Recent 20-session price change: ${change.toFixed(2)}%.` };
+    }
+    return { label: "Sideways / mixed", tone: "ta-warn", detail: `Recent 20-session price change: ${change.toFixed(2)}%; indicators are mixed.` };
+}
+
+function renderSignals(data) {
+    const result = calculateSignal(data);
+    const trend = detectTrend(data);
+    const levels = findSupportResistance(
+        Array.isArray(data.history) ? data.history : [],
+        result.price
+    );
+
+    setText("ta-signal", result.signal);
+    el("ta-signal").className = `ta-value ${result.tone}`;
+    setText("ta-signal-summary", result.summary);
+    setText("ta-score", result.score === null ? "Unavailable" : `${result.score > 0 ? "+" : ""}${result.score}/100`);
+
+    const bar = el("ta-score-bar");
+    bar.style.width = result.score === null ? "0%" : `${(result.score + 100) / 2}%`;
+    bar.style.background = result.score === null ? "#64748b" :
+        result.score >= 35 ? "#34d399" :
+        result.score <= -35 ? "#fb7185" : "#fbbf24";
+
+    setText("ta-agreement", result.agreement);
+    setText("ta-trend", trend.label);
+    el("ta-trend").className = `ta-value ${trend.tone}`;
+    setText("ta-trend-details", trend.detail);
+
+    const reasonList = el("ta-signal-reasons");
+    reasonList.replaceChildren();
+    result.reasons.forEach((reason) => addListItem(reasonList, reason));
+
+    setText("ta-support", levels.support === null ? "Unavailable" : fmtPrice(levels.support));
+    setText("ta-resistance", levels.resistance === null ? "Unavailable" : fmtPrice(levels.resistance));
+    setText("ta-price-position", levels.position);
+
+    setText("ta-support-distance", levels.support !== null && result.price !== null
+        ? `${((result.price - levels.support) / result.price * 100).toFixed(2)}% below current price`
+        : "Insufficient data");
+
+    setText("ta-resistance-distance", levels.resistance !== null && result.price !== null
+        ? `${((levels.resistance - result.price) / result.price * 100).toFixed(2)}% above current price`
+        : "Insufficient data");
+
+    renderAlerts(result);
+}
+
+function renderAlerts(result) {
+    const container = el("ta-alerts");
+    container.replaceChildren();
+    const alerts = [];
+    const v = result.indicators;
+
+    if (v.rsi !== null && v.rsi >= 70) {
+        alerts.push({
+            level: "warning",
+            text: `RSI is ${v.rsi.toFixed(2)} — commonly considered overbought. This is not proof that price will fall.`
+        });
+    } else if (v.rsi !== null && v.rsi <= 30) {
+        alerts.push({
+            level: "warning",
+            text: `RSI is ${v.rsi.toFixed(2)} — commonly considered oversold. This is not proof that price will rise.`
+        });
+    } else if (v.rsi !== null) {
+        alerts.push({
+            level: "positive",
+            text: `RSI is ${v.rsi.toFixed(2)}, between the common 30 and 70 alert thresholds.`
+        });
+    } else {
+        alerts.push({
+            level: "warning",
+            text: "RSI alert unavailable because there is insufficient indicator data."
+        });
+    }
+
+    if (v.macd !== null && v.signal !== null) {
+        if (v.macd > v.signal) {
+            alerts.push({ level: "positive", text: "MACD is above its signal line: momentum is bullish by this rule." });
+        } else if (v.macd < v.signal) {
+            alerts.push({ level: "negative", text: "MACD is below its signal line: momentum is bearish by this rule." });
+        } else {
+            alerts.push({ level: "warning", text: "MACD and signal line are equal; no directional difference." });
+        }
+    } else {
+        alerts.push({ level: "warning", text: "MACD alert unavailable because there is insufficient indicator data." });
+    }
+
+    alerts.forEach((alert) => {
+        const box = document.createElement("div");
+        box.className = "ta-alert";
+        box.dataset.level = alert.level;
+        box.textContent = alert.text;
+        container.appendChild(box);
+    });
+}
+
+function renderIndicators(data) {
+    const v = getIndicatorValues(data);
+    setText("ta-rsi", fmtNum(v.rsi));
+    setText("ta-sma20", fmtPrice(v.sma20));
+    setText("ta-sma50", fmtPrice(v.sma50));
+    setText("ta-ema20", fmtPrice(v.ema20));
+    setText("ta-macd", fmtNum(v.macd, 4));
+    setText("ta-macd-signal", fmtNum(v.signal, 4));
+    setText("ta-macd-histogram", fmtNum(v.histogram, 4));
+
+    let interpretation = "Insufficient data for RSI.";
+    if (v.rsi !== null) {
+        if (v.rsi >= 70) interpretation = "Often considered overbought.";
+        else if (v.rsi <= 30) interpretation = "Often considered oversold.";
+        else interpretation = "Between common 30 and 70 thresholds.";
+    }
+    setText("ta-rsi-interpretation", interpretation);
+}
+
+function renderStock(data) {
+    const quote = data.quote || {};
+    const company = data.company || {};
+    const history = Array.isArray(data.history) ? data.history : [];
+
+    currentCurrency = typeof company.currency === "string" &&
+        /^[A-Z]{3}$/.test(company.currency) ? company.currency : "USD";
+
+    setText("ta-company-name", `${company.name || data.symbol || "Company"} (${data.symbol || ""})`);
+    setText("ta-company-details", [
+        company.exchange, company.industry, company.country
+    ].filter(Boolean).join(" · ") || "Company details unavailable.");
+
+    setText("ta-price", fmtPrice(quote.current));
+
+    const change = num(quote.change);
+    const changePercent = num(quote.changePercent);
+
+    setText("ta-change", change === null ? "Unavailable" :
+        `${change > 0 ? "+" : ""}${fmtPrice(change)}`);
+    setText("ta-change-percent", changePercent === null ? "Unavailable" :
+        `${changePercent > 0 ? "+" : ""}${changePercent.toFixed(2)}%`);
+
+    el("ta-change").classList.toggle("ta-positive", change !== null && change > 0);
+    el("ta-change").classList.toggle("ta-negative", change !== null && change < 0);
+
+    setText("ta-day-range", quote.low == null || quote.high == null
+        ? "Unavailable" : `${fmtPrice(quote.low)} – ${fmtPrice(quote.high)}`);
+    setText("ta-previous-close", fmtPrice(quote.previousClose));
+
+    const status = data.dataStatus || {};
+    setText("ta-data-status", [
+        status.note,
+        status.quoteTimestamp ? `Quote timestamp: ${new Date(status.quoteTimestamp).toLocaleString()}` : ""
+    ].filter(Boolean).join(" "));
+
+    renderIndicators(data);
+    renderSignals(data);
+    renderHistory(history);
+
+    drawLineChart("ta-price-chart", history.map((item) => ({
+        label: item.date,
+        value: item.close
+    })));
+
+    setText("ta-price-chart-message", history.length
+        ? `${history.length} daily price records loaded.`
+        : "No daily price history is available.");
+
+    const volumePoints = history.filter((item) =>
+        typeof item.date === "string" && num(item.volume) !== null
+    ).map((item) => ({ label: item.date, value: item.volume }));
+
+    drawLineChart("ta-volume-chart", volumePoints, {
+        color: "#34d399",
+        bars: true
+    });
+
+    setText("ta-volume-message", volumePoints.length
+        ? "Daily trading volume from the stock API."
+        : "Trading volume is unavailable.");
+}
+
+async function loadStock(symbol) {
+    const requestId = ++activeRequest;
+    analyzeButton.disabled = true;
+    message.textContent = `Loading ${symbol}…`;
+
+    try {
+        const response = await fetch(`/api/stocks/${encodeURIComponent(symbol)}`, {
+            method: "GET",
+            credentials: "same-origin",
+            headers: { Accept: "application/json" }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (requestId !== activeRequest) return;
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error("Please log in to TaskSpace before using stock analysis.");
+            }
+            throw new Error(data.error || `Request failed (${response.status}).`);
+        }
+
+        lastStockData = data;
+        renderStock(data);
+        message.textContent = `Technical analysis loaded for ${data.symbol || symbol}.`;
+    } catch (error) {
+        if (requestId !== activeRequest) return;
+
+        message.textContent = error instanceof Error ? error.message : "Unable to load stock data.";
+        lastStockData = null;
+        clearIndicatorDisplays();
+        clearCanvas("ta-price-chart", "Price history could not be loaded.");
+        clearCanvas("ta-volume-chart", "Trading volume could not be loaded.");
+        setText("ta-company-name", "Company overview");
+        setText("ta-company-details", "Company information unavailable.");
+        setText("ta-price", "—");
+        setText("ta-change", "—");
+        setText("ta-change-percent", "—");
+        setText("ta-day-range", "—");
+        setText("ta-previous-close", "—");
+        setText("ta-data-status", "");
+        const tbody = el("ta-history-body");
+        tbody.replaceChildren();
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.textContent = "No price history loaded.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+    } finally {
+        if (requestId === activeRequest) analyzeButton.disabled = false;
+    }
+}
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const symbol = symbolInput.value.trim().toUpperCase();
+
+    if (!/^[A-Z0-9.^_-]{1,20}$/.test(symbol)) {
+        message.textContent = "Enter a valid ticker symbol.";
+        return;
+    }
+
+    symbolInput.value = symbol;
+    loadStock(symbol);
+});
+
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        if (!lastStockData) return;
+        const history = Array.isArray(lastStockData.history) ? lastStockData.history : [];
+
+        drawLineChart("ta-price-chart", history.map((item) => ({
+            label: item.date,
+            value: item.close
+        })));
+
+        drawLineChart("ta-volume-chart", history.filter((item) =>
+            typeof item.date === "string" && num(item.volume) !== null
+        ).map((item) => ({
+            label: item.date,
+            value: item.volume
+        })), { color: "#34d399", bars: true });
+    }, 200);
+});
+
+loadStock("AAPL");
+</script>
+</body>
+</html>

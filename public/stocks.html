@@ -1,0 +1,843 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="TaskSpace stock analysis dashboard with company fundamentals, technical indicators, price history and watchlists."
+    >
+
+    <title>Stock Analysis — TaskSpace</title>
+
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/stocks.css">
+
+    <script src="/stocks-page.js" defer></script>
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="TaskSpace home">
+            <span class="brand-icon">T</span>
+            <span>TaskSpace</span>
+        </a>
+
+        <div class="status">
+            <span class="status-dot"></span>
+
+            <a href="/" class="stocks-home-link">
+                Back to workspace
+            </a>
+
+            <a
+                href="/technical-analysis.html"
+                class="stocks-nav-button"
+            >
+                📈 Technical Analysis
+            </a>
+
+            <button
+                id="fundamental-analysis-menu-button"
+                class="stocks-nav-button"
+                type="button"
+            >
+                📊 Fundamental Analysis
+            </button>
+        </div>
+    </header>
+
+    <main class="page-container stocks-page">
+        <section class="page-heading">
+            <h1>Stock Analysis</h1>
+
+            <p>
+                Research stocks using company fundamentals,
+                technical indicators and historical prices.
+            </p>
+        </section>
+
+        <section class="panel stock-section">
+            <h2>Analyze a stock</h2>
+
+            <form id="stock-search-form" class="stock-search-form">
+                <label for="stock-symbol">
+                    Stock symbol
+                </label>
+
+                <div class="stock-search-controls">
+                    <input
+                        id="stock-symbol"
+                        name="symbol"
+                        type="text"
+                        placeholder="Enter a symbol, e.g. AAPL"
+                        value="AAPL"
+                        maxlength="20"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button
+                        id="stock-search-button"
+                        type="submit"
+                    >
+                        Analyze stock
+                    </button>
+                </div>
+            </form>
+
+            <p
+                id="stock-message"
+                class="stock-message"
+                role="status"
+                aria-live="polite"
+            ></p>
+        </section>
+
+        <section class="panel stock-section">
+            <h2>Company name</h2>
+
+            <div id="stock-company">
+                <p id="stock-company-name">
+                    Enter a stock symbol to analyze a company.
+                </p>
+
+                <p>
+                    Symbol:
+                    <strong id="stock-company-symbol">—</strong>
+                </p>
+            </div>
+
+            <div class="stock-price-summary">
+                <div>
+                    <span>Current price</span>
+                    <strong id="stock-current-price">—</strong>
+                </div>
+
+                <div>
+                    <span>Daily change</span>
+                    <strong id="stock-price-change">—</strong>
+                </div>
+
+                <div>
+                    <span>Previous close</span>
+                    <strong id="stock-previous-close">—</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel stock-section">
+            <h2>Price history</h2>
+
+            <p>
+                Review historical stock prices when price-history data
+                is available.
+            </p>
+
+            <div class="stock-chart-container">
+                <canvas
+                    id="stock-price-chart"
+                    aria-label="Stock price history chart"
+                    role="img"
+                ></canvas>
+            </div>
+
+            <p
+                id="stock-chart-message"
+                class="stock-message"
+                role="status"
+                aria-live="polite"
+            ></p>
+        </section>
+
+        <section class="panel stock-section">
+            <h2>Technical indicators</h2>
+
+            <p>
+                Technical indicators can help you evaluate price
+                momentum and trends. They do not guarantee future
+                performance.
+            </p>
+
+            <div class="stock-indicators-grid">
+                <article class="stock-indicator">
+                    <h3>RSI (14)</h3>
+                    <p id="indicator-rsi">—</p>
+                    <span>Relative Strength Index</span>
+                </article>
+
+                <article class="stock-indicator">
+                    <h3>SMA (20)</h3>
+                    <p id="indicator-sma-20">—</p>
+                    <span>20-period Simple Moving Average</span>
+                </article>
+
+                <article class="stock-indicator">
+                    <h3>SMA (50)</h3>
+                    <p id="indicator-sma-50">—</p>
+                    <span>50-period Simple Moving Average</span>
+                </article>
+
+                <article class="stock-indicator">
+                    <h3>EMA (12)</h3>
+                    <p id="indicator-ema-12">—</p>
+                    <span>12-period Exponential Moving Average</span>
+                </article>
+
+                <article class="stock-indicator">
+                    <h3>EMA (26)</h3>
+                    <p id="indicator-ema-26">—</p>
+                    <span>26-period Exponential Moving Average</span>
+                </article>
+
+                <article class="stock-indicator">
+                    <h3>MACD</h3>
+                    <p id="indicator-macd">—</p>
+                    <span>Moving Average Convergence Divergence</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="stock-comparison-section" class="panel stock-section">
+    <h2>Compare stocks</h2>
+    <p>
+        Compare two or three companies using the same fundamental
+        metrics returned by the TaskSpace stock API.
+    </p>
+
+    <form id="stock-comparison-form" class="stock-comparison-form">
+        <div class="stock-comparison-input">
+            <label for="comparison-symbol-1">First stock (required)</label>
+            <input id="comparison-symbol-1" type="text"
+                value="AAPL" maxlength="20" required
+                autocomplete="off" placeholder="AAPL">
+        </div>
+
+        <div class="stock-comparison-input">
+            <label for="comparison-symbol-2">Second stock (required)</label>
+            <input id="comparison-symbol-2" type="text"
+                value="MSFT" maxlength="20" required
+                autocomplete="off" placeholder="MSFT">
+        </div>
+
+        <div class="stock-comparison-input">
+            <label for="comparison-symbol-3">Third stock (optional)</label>
+            <input id="comparison-symbol-3" type="text"
+                maxlength="20" autocomplete="off" placeholder="GOOGL">
+        </div>
+
+        <button id="stock-comparison-button" type="submit">
+            Compare stocks
+        </button>
+    </form>
+
+    <p id="stock-comparison-message" class="stock-message"
+        role="status" aria-live="polite"></p>
+
+    <div class="comparison-highlight-explanation">
+        <strong>Understanding the Best highlights</strong>
+        <ul>
+            <li><span class="comparison-best-value-label">Best</span> identifies the strongest value among the selected companies for that metric.</li>
+            <li>Some metrics favour higher values, while others favour lower values.</li>
+            <li>When companies tie, all tied values are highlighted.</li>
+            <li>Missing or invalid data is excluded from the comparison.</li>
+        </ul>
+        <p>
+            These highlights are comparison signals, not investment recommendations.
+            A metric that looks favourable on its own may not tell the whole story.
+        </p>
+    </div>
+    <div id="stock-comparison-results"
+        class="stock-comparison-results" aria-live="polite"></div>
+
+    <p class="stock-disclaimer">
+        Comparisons are informational, not investment advice.
+        Some metrics may be unavailable, delayed, or unsuitable
+        for direct comparison across different industries.
+    </p>
+</section>
+<section
+            id="fundamentals-section"
+            class="panel stock-section"
+        >
+            <h2>Company fundamentals</h2>
+
+            <p>
+                Fundamental metrics help assess a company's financial
+                position, profitability, valuation and dividend history.
+            </p>
+
+            <div class="stock-fundamentals-grid">
+                <article class="stock-fundamental">
+                    <h3>Price-to-Earnings</h3>
+                    <p id="fund-pe">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Earnings Per Share</h3>
+                    <p id="fund-eps">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Revenue</h3>
+                    <p id="fund-revenue">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Profit Margin</h3>
+                    <p id="fund-margin">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Return on Equity</h3>
+                    <p id="fund-roe">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Return on Assets</h3>
+                    <p id="fund-roa">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Current Ratio</h3>
+                    <p id="fund-current-ratio">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>Dividend Yield</h3>
+                    <p id="fund-dividend">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>52-Week High</h3>
+                    <p id="fund-52-high">—</p>
+                </article>
+
+                <article class="stock-fundamental">
+                    <h3>52-Week Low</h3>
+                    <p id="fund-52-low">—</p>
+                </article>
+            </div>
+<div id="cash-flow-analysis" class="cash-flow-panel">
+    <h3>Advanced Cash-Flow Analysis</h3>
+    <p class="cash-flow-intro">
+        Evaluate operating cash flow, capital expenditure and free cash flow.
+    </p>
+
+    <div class="cash-flow-grid">
+        <article class="cash-flow-card">
+            <h4>Operating cash flow</h4>
+            <p id="cash-flow-operating">Unavailable</p>
+        </article>
+        <article class="cash-flow-card">
+            <h4>Capital expenditure</h4>
+            <p id="cash-flow-capex">Unavailable</p>
+        </article>
+        <article class="cash-flow-card">
+            <h4>Free cash flow</h4>
+            <p id="cash-flow-free">Unavailable</p>
+        </article>
+        <article class="cash-flow-card">
+            <h4>Free cash flow yield</h4>
+            <p id="cash-flow-yield">Unavailable</p>
+        </article>
+        <article class="cash-flow-card">
+            <h4>Operating cash flow / net income</h4>
+            <p id="cash-flow-quality">Unavailable</p>
+        </article>
+    </div>
+
+    <p id="cash-flow-report-date" class="cash-flow-note">
+        Latest reporting date: unavailable
+    </p>
+
+    <div class="cash-flow-history-wrap">
+        <h4>Cash-flow trends</h4>
+    <div id="cash-flow-trend-chart" class="cash-flow-trend-chart">
+        <p>Cash-flow trends will appear when historical data is available.</p>
+    </div>
+    <h4>Available reporting periods</h4>
+        <div id="cash-flow-history">
+            <p>Cash-flow history will appear here.</p>
+        </div>
+    </div>
+
+    <p id="cash-flow-message" class="cash-flow-note">
+        Optional data may be unavailable for some tickers.
+    </p>
+</div>
+
+            <p class="stock-disclaimer">
+                Financial data may be delayed or unavailable.
+                Metrics are informational and are not investment advice.
+            </p>
+        </section>
+
+            <section id="dcf-section" class="panel stock-section dcf-section">
+                <h2>DCF Valuation &amp; Margin of Safety</h2>
+
+                <p>
+                    Estimate a stock's intrinsic value using unlevered free cash flow (FCFF).
+                    FCFF is cash available to both debt and equity holders before financing costs.
+                </p>
+
+                <div class="dcf-market-summary">
+                    <span>Selected stock</span>
+                    <strong id="dcf-stock-name">Load a stock first</strong>
+                    <span>Current market price</span>
+                    <strong id="dcf-current-price">Unavailable</strong>
+                    <span>Currency</span>
+                    <strong id="dcf-currency">—</strong>
+                </div>
+
+                <form id="dcf-form" class="dcf-form">
+                    <div class="dcf-input-grid">
+                        <label>
+                            Starting annual free cash flow (FCF) - auto-filled estimate
+                            <span class="dcf-field-help">In millions of currency units. Yahoo reported FCF is an estimate and may differ from unlevered FCFF.</span>
+                            <input id="dcf-fcf" name="fcf" type="number"
+                                step="any" min="0.000001" required
+                                placeholder="e.g. 12000">
+                        </label>
+
+                        <label>
+                            Net debt
+                            <span class="dcf-field-help">Total debt minus cash, in millions. Negative means net cash. Net debt is subtracted from enterprise value to calculate equity value.</span>
+                            <input id="dcf-net-debt" name="netDebt" type="number"
+                                step="any" required placeholder="Enter net debt">
+                        </label>
+
+                        <label>
+                            Shares outstanding
+                            <span class="dcf-field-help">In millions of shares</span>
+                            <input id="dcf-shares" name="shares" type="number"
+                                step="any" min="0.000001" required
+                                placeholder="e.g. 15000">
+                        </label>
+
+                        <label>
+                            Annual FCF growth
+                            <span class="dcf-field-help">Forecast growth rate (%)</span>
+                            <input id="dcf-growth" name="growth" type="number"
+                                step="any" min="-50" max="100" value="5" required>
+                        </label>
+
+                        <label>
+                            Discount rate
+                            <span class="dcf-field-help">Required return (%)</span>
+                            <input id="dcf-discount" name="discount" type="number"
+                                step="any" min="0.1" max="50" value="10" required>
+                        </label>
+
+                        <label>
+                            Terminal growth rate
+                            <span class="dcf-field-help">Long-term growth after the forecast (%)</span>
+                            <input id="dcf-terminal-growth" name="terminalGrowth"
+                                type="number" step="any" min="-5" max="10"
+                                value="2.5" required>
+                        </label>
+
+                        <label>
+                            Forecast period
+                            <span class="dcf-field-help">Number of forecast years</span>
+                            <select id="dcf-years" name="years">
+                                <option value="5" selected>5 years</option>
+                                <option value="7">7 years</option>
+                                <option value="10">10 years</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <p class="dcf-field-help">
+                        For the most accurate valuation, use verified unlevered FCFF from a recent annual report or
+                        reliable financial statement. Use the same currency and
+                        millions-based units for FCFF and net debt.
+                    </p>
+
+                    <button type="submit" class="dcf-calculate-button">
+                        Calculate DCF valuation
+                    </button>
+                </form>
+
+                <section id="wacc-panel" class="wacc-panel">
+                    <h3>Weighted Average Cost of Capital (WACC)</h3>
+
+                    <p class="dcf-field-help">
+                        Estimate the company's cost of capital. WACC is commonly
+                        used as the discount rate when valuing unlevered free cash
+                        flow (FCFF).
+                    </p>
+
+                    <button type="button" id="wacc-auto-fill-button"
+                        class="dcf-calculate-button">
+                        Auto-fill from selected stock
+                    </button>
+
+                    <p class="dcf-field-help">
+                        Automatic values come from the selected stock's
+                        financial data. Review them before calculating WACC.
+                    </p>
+
+                    <form id="wacc-form">
+                        <div class="dcf-input-grid">
+                            <label>
+                                Risk-free rate (%)
+                                <span class="dcf-field-help">For example, the yield on a relevant government bond.</span>
+                                <input id="wacc-risk-free" type="number"
+                                    step="any" min="0" max="100"
+                                    value="4" required>
+                            </label>
+
+                            <label>
+                                Beta
+                                <span class="dcf-field-help">A measure of the stock's sensitivity to market movements.</span>
+                                <input id="wacc-beta" type="number"
+                                    step="any" min="-5" max="10"
+                                    value="1" required>
+                            </label>
+
+                            <label>
+                                Expected market return (%)
+                                <span class="dcf-field-help">Your estimated annual market return.</span>
+                                <input id="wacc-market-return" type="number"
+                                    step="any" min="0" max="100"
+                                    value="9" required>
+                            </label>
+
+                            <label>
+                                Pre-tax cost of debt (%)
+                                <span class="dcf-field-help">Estimated annual interest cost of company debt.</span>
+                                <input id="wacc-cost-debt" type="number"
+                                    step="any" min="0" max="100"
+                                    value="5" required>
+                            </label>
+
+                            <label>
+                                Corporate tax rate (%)
+                                <span class="dcf-field-help">The applicable corporate tax rate.</span>
+                                <input id="wacc-tax-rate" type="number"
+                                    step="any" min="0" max="100"
+                                    value="25" required>
+                            </label>
+
+                            <label>
+                                Market value of equity
+                                <span class="dcf-field-help">
+                                    Enter equity value in millions of the company's reporting currency.
+                                </span>
+                                <input id="wacc-equity" type="number"
+                                    step="any" min="0"
+                                    placeholder="e.g. 200000" required>
+                            </label>
+
+                            <label>
+                                Market value of debt
+                                <span class="dcf-field-help">
+                                    Enter debt in millions. Auto-fill uses gross book debt as an estimate,
+                                    not market value of debt.
+                                </span>
+                                <input id="wacc-debt" type="number"
+                                    step="any" min="0"
+                                    placeholder="e.g. 50000" required>
+                            </label>
+                        </div>
+
+                                                <div class="wacc-saved-controls">
+                            <button type="button" id="wacc-save-button"
+                                class="dcf-calculate-button">
+                                Save assumptions
+                            </button>
+
+                            <button type="button" id="wacc-load-button"
+                                class="dcf-calculate-button">
+                                Load saved assumptions
+                            </button>
+
+                            <button type="button" id="wacc-reset-button"
+                                class="dcf-calculate-button">
+                                Reset assumptions
+                            </button>
+                        </div>
+<button type="submit" class="dcf-calculate-button">
+                            Calculate WACC
+                        </button>
+                    </form>
+
+                    <div class="wacc-results" aria-live="polite">
+                        <div class="dcf-result-card">
+                            <span>CAPM cost of equity</span>
+                            <strong id="wacc-cost-equity-result">—</strong>
+                        </div>
+
+                        <div class="dcf-result-card">
+                            <span>Weighted average cost of capital</span>
+                            <strong id="wacc-result">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="wacc-breakdown">
+                        <h4>Calculation breakdown</h4>
+
+                        <div class="wacc-breakdown-grid">
+                            <div class="dcf-result-card">
+                                <span>Market risk premium</span>
+                                <strong id="wacc-market-premium-result">—</strong>
+                            </div>
+
+                            <div class="dcf-result-card">
+                                <span>After-tax cost of debt</span>
+                                <strong id="wacc-after-tax-debt-result">—</strong>
+                            </div>
+
+                            <div class="dcf-result-card">
+                                <span>Equity weighting</span>
+                                <strong id="wacc-equity-weight-result">—</strong>
+                            </div>
+
+                            <div class="dcf-result-card">
+                                <span>Debt weighting</span>
+                                <strong id="wacc-debt-weight-result">—</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <section class="wacc-history">
+                        <div class="wacc-history-heading">
+                            <h4>WACC calculation history</h4>
+                            <button
+                                type="button"
+                                id="wacc-history-clear-button"
+                                class="dcf-calculate-button">
+                                Clear history
+                            </button>
+                        </div>
+
+                        <p class="dcf-field-help">
+                            Your latest 20 successful WACC calculations
+                            are saved locally in this browser.
+                        </p>
+
+                        <div
+                            id="wacc-history-list"
+                            class="wacc-history-list"
+                            aria-live="polite">
+                        </div>
+                        <div class="wacc-comparison">
+                            <h4>Compare selected calculations</h4>
+                            <p class="dcf-field-help">
+                                Select up to three history entries to compare
+                                their WACC results and assumptions.
+                            </p>
+            <button
+                type="button"
+                id="wacc-comparison-export-button"
+                class="dcf-calculate-button">
+                Export comparison to CSV
+            </button>
+                            <div
+                                id="wacc-comparison-results"
+                                class="wacc-comparison-results"
+                                aria-live="polite">
+                            </div>
+                        </div>
+                    </section>
+                    <p id="wacc-status" class="dcf-status" role="status" aria-live="polite">
+                        Enter the company's capital values and assumptions to calculate WACC.
+                    </p>
+
+                    <button type="button" id="wacc-use-button"
+                        class="dcf-calculate-button" disabled>
+                        Use WACC as DCF discount rate
+                    </button>
+
+                    <p class="dcf-field-help">
+                        The calculator uses CAPM for cost of equity and the
+                        after-tax cost of debt. WACC is appropriate for FCFF
+                        valuation; FCFE is normally discounted using cost of equity.
+                    </p>
+                </section>
+                <p id="dcf-status" class="dcf-status" role="status" aria-live="polite">
+                    Enter the company's cash flow, net debt and shares outstanding to begin.
+                </p>
+
+                          <section id="dcf-quality-warnings" class="dcf-quality-warnings" hidden aria-live="polite">
+                    <h3>DCF data quality and assumption checks</h3>
+                    <ul id="dcf-quality-warning-list"></ul>
+                </section>
+      <div id="dcf-fcff-breakdown" class="dcf-fcff-breakdown" hidden>
+                    <h3>Annual FCFF calculation breakdown</h3>
+                    <p id="dcf-fcff-breakdown-date" class="dcf-field-help"></p>
+                    <div id="dcf-fcff-breakdown-content"></div>
+                    <p class="dcf-field-help">
+                        Source: Yahoo Finance annual financial statements.
+                        Values are displayed in millions. Review the original
+                        statements and accounting sign conventions before relying
+                        on this estimate.
+                    </p>
+                </div>
+
+                <div class="dcf-results-grid">
+                    <article class="dcf-result-card">
+                        <span>Estimated intrinsic value per share</span>
+                        <strong id="dcf-intrinsic-value">—</strong>
+                    </article>
+                    <article class="dcf-result-card">
+                        <span>Margin of safety</span>
+                        <strong id="dcf-margin-safety">—</strong>
+                    </article>
+                    <article class="dcf-result-card">
+                        <span>Upside / downside vs. price</span>
+                        <strong id="dcf-upside">—</strong>
+                    </article>
+                    <article class="dcf-result-card">
+                        <span>Enterprise value</span>
+                        <strong id="dcf-enterprise-value">—</strong>
+                    </article>
+                    <article class="dcf-result-card">
+                        <span>Equity value</span>
+                        <strong id="dcf-equity-value">—</strong>
+                    </article>
+                </div>
+
+                <h3>DCF scenario comparison</h3>
+                <p>
+                    Conservative: growth 2 percentage points lower and discount
+                    rate 1 point higher. Optimistic: growth 2 points higher and
+                    discount rate 1 point lower. The terminal growth rate stays
+                    the same in all scenarios.
+                </p>
+
+                <div class="dcf-table-wrapper">
+                    <table class="dcf-scenario-table">
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>FCF growth</th>
+                                <th>Discount rate</th>
+                                <th>Value per share</th>
+                                <th>Margin of safety</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dcf-scenario-results">
+                            <tr><td colspan="5">Run a valuation to see scenarios.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>DCF Sensitivity Analysis</h3>
+                <p>
+                    Compare estimated intrinsic value per share under different
+                    annual free-cash-flow growth and discount-rate assumptions.
+                    Green cells indicate an estimate above the market price;
+                    red cells indicate an estimate below it.
+                </p>
+
+                <div class="dcf-sensitivity-legend" aria-label="Sensitivity table legend">
+                    <span class="dcf-legend-item">
+                        <span class="dcf-legend-swatch dcf-legend-above"></span>
+                        Above market price
+                    </span>
+                    <span class="dcf-legend-item">
+                        <span class="dcf-legend-swatch dcf-legend-below"></span>
+                        Below market price
+                    </span>
+                    <span class="dcf-legend-item">
+                        <span class="dcf-legend-swatch dcf-legend-invalid"></span>
+                        Invalid combination
+                    </span>
+                    <span class="dcf-legend-item">
+                        <span class="dcf-legend-swatch dcf-legend-base"></span>
+                        Base-case assumptions
+                    </span>
+                </div>
+<div class="dcf-table-wrapper dcf-sensitivity-wrapper">
+                    <table class="dcf-sensitivity-table"
+                           aria-label="DCF valuation sensitivity analysis">
+                        <thead>
+                            <tr id="dcf-sensitivity-head">
+                                <th scope="col">FCF growth / discount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dcf-sensitivity-results">
+                            <tr>
+                                <td>Run a DCF valuation to see sensitivity results.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="stock-disclaimer">
+                    DCF is sensitive to assumptions and data quality. This model
+                    uses constant annual FCF growth and a perpetual-growth terminal
+                    value. It is a screening estimate, not investment advice or a
+                    guarantee of fair value. Some industries require different
+                    valuation methods.
+                </p>
+            </section>
+            
+
+    <section class="panel stock-section">
+            <h2>Your watchlist</h2>
+
+            <p>
+                Keep track of stocks you want to follow.
+            </p>
+
+            <form id="watchlist-form" class="stock-search-form">
+                <label for="watchlist-symbol">
+                    Add a stock symbol
+                </label>
+
+                <div class="stock-search-controls">
+                    <input
+                        id="watchlist-symbol"
+                        name="symbol"
+                        type="text"
+                        placeholder="e.g. MSFT"
+                        maxlength="20"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button
+                        id="watchlist-add-button"
+                        type="submit"
+                    >
+                        Add to watchlist
+                    </button>
+                </div>
+            </form>
+
+            <p
+                id="watchlist-message"
+                class="stock-message"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+            <div
+                id="watchlist-container"
+                class="watchlist-container"
+            >
+                <p id="watchlist-empty">
+                    Your watchlist will appear here.
+                </p>
+
+                <ul id="watchlist-list"></ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

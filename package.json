@@ -1,0 +1,22 @@
+{
+  "name": "taskspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A beginner-friendly full-stack Node.js task manager",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test ./test/app.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.0",
+    "better-sqlite3": "^12.0.0",
+    "dotenv": "^16.0.0",
+    "express": "^5.0.0",
+    "express-session": "^1.18.0",
+    "finnhub": "^2.0.15",
+    "helmet": "^8.0.0",
+    "yahoo-finance2": "^4.0.5"
+  }
+}

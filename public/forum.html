@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Join discussions and share ideas with the TaskSpace community.">
+    <title>TaskSpace Forum</title>
+    <link rel="stylesheet" href="/forum.css">
+    <script src="/forum.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="/">TaskSpace <span>Forum</span></a>
+            <nav class="header-nav" aria-label="Main navigation">
+                <a href="/">TaskSpace Home</a>
+                <a href="#new-discussion">New discussion</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <p class="eyebrow">TASKSPACE COMMUNITY</p>
+            <h1>Discuss. Share. Learn.</h1>
+            <p>Ask questions, exchange ideas, and help each other.</p>
+        </section>
+
+        <section class="panel composer" id="new-discussion">
+            <div class="section-heading">
+                <div>
+                    <h2>Start a discussion</h2>
+                    <p>Share a question, an idea, or an announcement.</p>
+                </div>
+            </div>
+
+            <form id="post-form">
+                <label for="post-title">Title</label>
+                <input
+                    id="post-title"
+                    name="title"
+                    type="text"
+                    maxlength="160"
+                    placeholder="What would you like to discuss?"
+                    required
+                >
+
+                <label for="post-category">Category</label>
+                <select id="post-category" name="category" required>
+                    <option value="General">General</option>
+                </select>
+
+                <label for="post-body">Message</label>
+                <textarea
+                    id="post-body"
+                    name="body"
+                    rows="5"
+                    maxlength="10000"
+                    placeholder="Write your message..."
+                    required
+                ></textarea>
+
+                <div class="form-footer">
+                    <span class="muted">Please be respectful of other members.</span>
+                    <button class="button primary" type="submit">Publish discussion</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="discussions-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Community discussions</h2>
+                    <p>Explore what the community is talking about.</p>
+                </div>
+                <span id="post-count" class="count-badge">Loading…</span>
+            </div>
+
+            <div class="toolbar">
+                <label class="search-field">
+                    <span class="visually-hidden">Search discussions</span>
+                    <input
+                        id="search-input"
+                        type="search"
+                        maxlength="100"
+                        placeholder="Search discussions..."
+                    >
+                </label>
+
+                <label>
+                    <span class="visually-hidden">Filter by category</span>
+                    <select id="filter-category">
+                        <option value="">All categories</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span class="visually-hidden">Sort discussions</span>
+                    <select id="sort-select">
+                        <option value="newest">Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="comments">Most comments</option>
+                    </select>
+                </label>
+
+                <button id="search-button" class="button secondary" type="button">
+                    Search
+                </button>
+            </div>
+
+            <div id="status-message" class="status-message" role="status" aria-live="polite"></div>
+            <div id="posts-container" class="posts-list"></div>
+
+            <div class="pagination">
+                <button id="previous-page" class="button secondary" type="button" disabled>
+                    Previous
+                </button>
+                <span id="page-indicator">Page 1</span>
+                <button id="next-page" class="button secondary" type="button" disabled>
+                    Next
+                </button>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <p>TaskSpace Forum · A place for ideas and collaboration</p>
+        </footer>
+    </main>
+</body>
+</html>

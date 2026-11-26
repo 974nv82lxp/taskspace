@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101426">
+    <meta name="description" content="Check TaskSpace application and database status.">
+    <title>System Status — TaskSpace</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/system-status.css">
+    <script src="/system-status.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="TaskSpace home">
+            <span class="brand-icon" aria-hidden="true">T</span>
+            <span>TaskSpace</span>
+        </a>
+        <a class="stocks-nav-button" href="/">← Workspace</a>
+    </header>
+
+    <main class="container system-status-page">
+        <section class="system-status-intro">
+            <p class="eyebrow">TASKSPACE ADMINISTRATION</p>
+            <h1>System Status</h1>
+            <p>Check the application response, database connection, and session configuration.</p>
+
+            <div class="system-status-actions">
+                <button id="refresh-status" type="button">↻ Refresh status</button>
+                <a href="/stocks.html">Stocks</a>
+                <a href="/forum.html">Forum</a>
+            </div>
+        </section>
+
+        <section class="system-status-summary" aria-live="polite">
+            <span id="overall-indicator" class="status-indicator status-unknown"></span>
+            <div>
+                <h2 id="overall-title">Checking TaskSpace…</h2>
+                <p id="overall-message">Contacting the protected status endpoint.</p>
+            </div>
+        </section>
+
+        <section class="system-status-grid" aria-label="System checks">
+            <article class="system-status-card">
+                <span class="system-status-icon" aria-hidden="true">⚙️</span>
+                <h2>Application</h2>
+                <p>TaskSpace API response</p>
+                <strong id="application-status" class="status-value">Checking…</strong>
+            </article>
+
+            <article class="system-status-card">
+                <span class="system-status-icon" aria-hidden="true">🗄️</span>
+                <h2>Database</h2>
+                <p>SQLite query test</p>
+                <strong id="database-status" class="status-value">Checking…</strong>
+            </article>
+
+            <article class="system-status-card">
+                <span class="system-status-icon" aria-hidden="true">🔐</span>
+                <h2>Session configuration</h2>
+                <p>Server startup validation</p>
+                <strong id="session-status" class="status-value">Checking…</strong>
+            </article>
+
+            <article class="system-status-card">
+                <span class="system-status-icon" aria-hidden="true">⏱️</span>
+                <h2>Server uptime</h2>
+                <p>Time since the server started</p>
+                <strong id="uptime-status" class="status-value">—</strong>
+            </article>
+        </section>
+
+        <section class="system-status-details">
+            <h2>Last check</h2>
+            <p id="last-checked">Not checked yet.</p>
+            <p id="login-notice" hidden>
+                Please <a href="/">return to TaskSpace and sign in</a> to view system details.
+            </p>
+            <p id="error-notice" class="system-status-error" hidden></p>
+        </section>
+    </main>
+</body>
+</html>

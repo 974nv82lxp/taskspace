@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <title>TaskSpace Chat</title>
+    <link rel="stylesheet" href="/chat.css">
+    <script src="/chat.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">TaskSpace</a>
+        <div class="topbar-right">
+            <span id="current-user" class="current-user">Loading account…</span>
+            <a class="back-link" href="/">Back to workspace</a>
+        </div>
+    </header>
+
+    <main class="chat-layout">
+        <aside class="sidebar">
+            <h1>Messages</h1>
+            <p class="muted">Private conversations with TaskSpace users.</p>
+
+            <form id="new-chat-form" class="new-chat-form">
+                <label for="username-search">Start a conversation</label>
+                <input
+                    id="username-search"
+                    name="username"
+                    type="text"
+                    minlength="3"
+                    maxlength="30"
+                    pattern="[A-Za-z0-9_]{3,30}"
+                    placeholder="Enter a username"
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit">Find user</button>
+            </form>
+
+            <p id="search-status" class="status" role="status" aria-live="polite"></p>
+            <div id="user-results" class="user-results"></div>
+
+            <h2 class="conversation-heading">Your conversations</h2>
+            <div id="conversation-list" class="conversation-list">
+                <p class="muted">Loading conversations…</p>
+            </div>
+        </aside>
+
+        <section class="chat-panel" aria-label="Private chat">
+            <div id="empty-chat" class="empty-chat">
+                <div class="empty-icon" aria-hidden="true">✉</div>
+                <h2>Your conversations</h2>
+                <p>Select a conversation or search for a username to get started.</p>
+            </div>
+
+            <div id="active-chat" class="active-chat" hidden>
+                <div class="chat-header">
+                    <div>
+                        <h2 id="chat-title">Conversation</h2>
+                        <p class="muted">Private message conversation</p>
+                    </div>
+                    <span id="chat-status" class="chat-status">Connected</span>
+                </div>
+
+                <div
+                    id="message-list"
+                    class="message-list"
+                    aria-live="polite"
+                    aria-label="Messages"
+                ></div>
+
+                <form id="message-form" class="message-form">
+                    <label class="visually-hidden" for="message-input">Your message</label>
+                    <textarea
+                        id="message-input"
+                        name="body"
+                        rows="2"
+                        maxlength="4000"
+                        placeholder="Write a message…"
+                        required
+                    ></textarea>
+                    <button id="send-button" type="submit">Send</button>
+                </form>
+
+                <p id="message-status" class="status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101426">
+    <meta name="description" content="Browse the TaskSpace demonstration shop and manage your shopping cart.">
+    <title>TaskSpace Shop</title>
+    <link rel="stylesheet" href="/shop.css">
+    <script src="/shop.js" defer></script>
+</head>
+<body>
+    <header class="shop-header">
+        <a class="brand" href="/" aria-label="Return to TaskSpace">
+            <span class="brand-icon">T</span>
+            <span>TaskSpace</span>
+        </a>
+
+        <nav aria-label="Shop navigation">
+            <a href="/">Workspace</a>
+            <a href="/stocks.html">Stocks</a>
+            <a href="#products">Products</a>
+            <a href="#cart">Shopping cart <span id="cart-count" class="cart-count">0</span></a>
+        </nav>
+    </header>
+
+    <main class="shop-container">
+        <section class="shop-hero">
+            <p class="eyebrow">TASKSPACE MARKETPLACE</p>
+            <h1>Shop your workspace.</h1>
+            <p>Browse demonstration products, add items to your cart, and try the order workflow.</p>
+            <p class="demo-notice">
+                Demo shop: sample products only. Checkout records an order but does not take payment.
+            </p>
+        </section>
+
+        <section id="products" class="shop-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">THE CATALOGUE</p>
+                    <h2>Products</h2>
+                </div>
+                <p id="shop-status" class="status-message" role="status" aria-live="polite"></p>
+            </div>
+
+            <div id="product-grid" class="product-grid">
+                <p>Loading products…</p>
+            </div>
+        </section>
+
+        <section id="cart" class="shop-section cart-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">YOUR SELECTION</p>
+                    <h2>Shopping cart</h2>
+                </div>
+                <button id="refresh-cart-button" class="secondary-button" type="button">
+                    Refresh cart
+                </button>
+            </div>
+
+            <p id="login-notice" class="demo-notice hidden">
+                Log in to TaskSpace before adding products to your saved cart.
+                <a href="/">Go to login</a>
+            </p>
+
+            <div id="cart-items" class="cart-items">
+                <p>Your cart will appear here.</p>
+            </div>
+
+            <div class="cart-summary">
+                <div>
+                    <span class="muted">Total</span>
+                    <strong id="cart-total">0,00 kr</strong>
+                </div>
+                <button id="checkout-button" class="primary-button" type="button" disabled>
+                    Place demo order
+                </button>
+            </div>
+
+            <p class="muted small-print">
+                Placing a demo order does not charge money, collect payment details, or arrange delivery.
+            </p>
+        </section>
+
+        <section id="orders" class="shop-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">YOUR ACTIVITY</p>
+                    <h2>Recent orders</h2>
+                </div>
+                <button id="refresh-orders-button" class="secondary-button" type="button">
+                    Refresh orders
+                </button>
+            </div>
+            <div id="order-list" class="order-list">
+                <p class="muted">Log in to view your orders.</p>
+            </div>
+        </section>
+
+        <footer class="shop-footer">
+            <a href="/">← Back to your TaskSpace workspace</a>
+            <p>TaskSpace · Demonstration shop</p>
+        </footer>
+    </main>
+</body>
+</html>

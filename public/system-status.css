@@ -1,0 +1,159 @@
+.system-status-page {
+    padding-top: 36px;
+    padding-bottom: 60px;
+}
+
+.system-status-intro {
+    margin-bottom: 28px;
+}
+
+.system-status-intro h1 {
+    margin: 8px 0;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.system-status-intro > p:not(.eyebrow) {
+    max-width: 720px;
+    line-height: 1.7;
+    opacity: 0.82;
+}
+
+.system-status-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.system-status-actions button,
+.system-status-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border: 1px solid #6558c8;
+    border-radius: 10px;
+    background: #292448;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.system-status-actions button:hover,
+.system-status-actions a:hover {
+    background: #3a3268;
+}
+
+.system-status-summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(140, 140, 180, 0.3);
+    border-radius: 16px;
+    background: rgba(35, 39, 65, 0.65);
+}
+
+.system-status-summary h2 {
+    margin: 0 0 8px;
+}
+
+.system-status-summary p {
+    margin: 0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.status-indicator {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    margin-top: 7px;
+    border-radius: 50%;
+    background: #9295a5;
+}
+
+.status-ok {
+    background: #38c989 !important;
+}
+
+.status-error {
+    background: #ff6b76 !important;
+}
+
+.status-unknown {
+    background: #e7b85b !important;
+}
+
+.system-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 16px;
+}
+
+.system-status-card {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid rgba(140, 140, 180, 0.3);
+    border-radius: 16px;
+    background: rgba(35, 39, 65, 0.5);
+}
+
+.system-status-icon {
+    font-size: 1.7rem;
+}
+
+.system-status-card h2 {
+    margin: 14px 0 8px;
+    font-size: 1.1rem;
+}
+
+.system-status-card p {
+    min-height: 24px;
+    opacity: 0.78;
+}
+
+.status-value {
+    display: inline-block;
+    margin-top: 8px;
+    overflow-wrap: anywhere;
+}
+
+.system-status-details {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 14px;
+    background: rgba(35, 39, 65, 0.4);
+}
+
+.system-status-details h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+}
+
+.system-status-details p {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.system-status-error {
+    color: #ff8a92;
+}
+
+@media (max-width: 600px) {
+    .system-status-page {
+        padding-top: 22px;
+    }
+
+    .system-status-summary {
+        padding: 16px;
+    }
+
+    .system-status-card {
+        padding: 18px;
+    }
+}

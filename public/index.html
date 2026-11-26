@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="TaskSpace helps you organize tasks, track progress, manage deadlines, and stay productive."
+    >
+
+    <meta name="theme-color" content="#101426">
+
+    <title>TaskSpace — Your Productivity Workspace</title>
+
+    <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/assistant-widget.css">
+    <script src="/app.js" defer></script>
+    <script src="/media.js" defer></script>
+    <script src="/assistant-widget.js" defer></script>
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="TaskSpace home">
+            <span class="brand-icon" aria-hidden="true">T</span>
+            <span>TaskSpace</span>
+        </a>
+<a class="stocks-nav-button" href="/stocks.html">
+    📈 Stocks
+</a>
+<a class="stocks-nav-button" href="/system-status.html">
+    🛠 System Status
+</a>
+        <div class="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>Your personal workspace</span>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- LOGIN AND REGISTRATION -->
+
+        <section id="auth-section" class="auth-layout">
+            <div class="intro">
+                <p class="eyebrow">PLAN · ORGANIZE · ACHIEVE</p>
+
+                <h1>
+                    Make room for
+                    <span>what matters.</span>
+                </h1>
+
+                <p class="muted">
+                    Organize your tasks, set priorities, manage deadlines,
+                    and follow your progress in one personal workspace.
+                </p>
+
+                <div class="feature-list">
+                    <p>✓ Organize tasks into categories</p>
+                    <p>✓ Track completion and priorities</p>
+                    <p>✓ Manage deadlines and overdue work</p>
+                    <p>✓ Keep your tasks in your own account</p>
+                </div>
+            </div>
+
+            <div class="panel auth-panel">
+                <h2 id="auth-heading">Welcome back</h2>
+
+                <p id="auth-description" class="muted">
+                    Log in to continue to your workspace.
+                </p>
+
+                <div class="auth-switch" role="group" aria-label="Account access">
+                    <button
+                        id="login-tab"
+                        class="switch active"
+                        type="button"
+                    >
+                        Log in
+                    </button>
+
+                    <button
+                        id="register-tab"
+                        class="switch"
+                        type="button"
+                    >
+                        Register
+                    </button>
+                </div>
+
+                <form id="auth-form">
+                    <div class="field">
+                        <label for="username">Username</label>
+
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            minlength="3"
+                            maxlength="30"
+                            pattern="[a-zA-Z0-9_]{3,30}"
+                            autocomplete="username"
+                            placeholder="Enter your username"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            minlength="12"
+                            maxlength="72"
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <p id="password-help" class="help hidden">
+                            Use a password between 12 and 72 characters.
+                        </p>
+                    </div>
+
+                    <button
+                        id="auth-submit"
+                        class="primary full"
+                        type="submit"
+                    >
+                        Log in
+                    </button>
+                </form>
+
+                <p
+                    id="auth-message"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+            </div>
+        </section>
+
+        <!-- WORKSPACE NAVIGATION -->
+
+        <nav class="workspace-nav" aria-label="Workspace navigation">
+            <a href="#workspace-overview">Overview</a>
+            <a href="#workspace-tasks">Tasks</a>
+            <a href="#taskspace-media-panel">Media library</a>
+            <a href="/chat.html" class="forum-menu-button">
+                <span aria-hidden="true">✉️</span>
+                <span>Private Chat</span>
+            </a>
+
+            <a href="/forum.html" class="forum-menu-button">
+                <span aria-hidden="true">💬</span>
+                <span>Forum</span>
+            </a>
+        </nav>
+
+        <!-- TASK DASHBOARD -->
+
+        <section id="dashboard-section" class="hidden">
+
+            <!-- Dashboard heading -->
+
+            <div class="dashboard-heading" id="workspace-overview">
+                <div>
+                    <p class="eyebrow">YOUR WORKSPACE</p>
+
+                    <h1 id="welcome-heading">Your tasks</h1>
+
+                    <p class="muted">
+                        Small steps add up to big progress.
+                    </p>
+                </div>
+
+                <button
+                    id="logout-button"
+                    class="secondary"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+
+            <!-- Main statistics -->
+
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <p class="muted">Tasks shown</p>
+                    <p id="total-count" class="stat-number">0</p>
+                </article>
+
+                <article class="stat-card">
+                    <p class="muted">Completed</p>
+                    <p id="completed-count" class="stat-number">0</p>
+                </article>
+
+                <article class="stat-card">
+                    <p class="muted">Remaining</p>
+                    <p id="remaining-count" class="stat-number">0</p>
+                </article>
+            </div>
+
+            <!-- Overall progress -->
+
+            <section
+                class="panel progress-panel"
+                aria-labelledby="progress-heading"
+            >
+                <div class="progress-heading">
+                    <div>
+                        <p class="eyebrow">YOUR ACHIEVEMENTS</p>
+
+                        <h2 id="progress-heading">Overall progress</h2>
+
+                        <p class="muted progress-description">
+                            Every completed task moves you forward.
+                        </p>
+                    </div>
+
+                    <div class="overall-percentage">
+                        <span id="overall-percentage">0%</span>
+                        <span class="muted">complete</span>
+                    </div>
+                </div>
+
+                <div
+                    id="overall-progress"
+                    class="progress-track overall-progress-track"
+                    role="progressbar"
+                    aria-label="Overall task completion"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                >
+                    <div
+                        id="overall-progress-fill"
+                        class="progress-fill"
+                    ></div>
+                </div>
+
+                <p
+                    id="progress-summary"
+                    class="muted progress-summary"
+                >
+                    No tasks to measure yet.
+                </p>
+            </section>
+
+            <!-- Category progress -->
+
+            <section
+                class="category-progress-section"
+                aria-labelledby="category-progress-heading"
+            >
+                <div class="section-title-row">
+                    <div>
+                        <p class="eyebrow">STAY ORGANIZED</p>
+
+                        <h2 id="category-progress-heading">
+                            Progress by category
+                        </h2>
+
+                        <p class="muted">
+                            See how you are progressing in each area.
+                            These summaries follow your current task filters.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    id="category-progress-grid"
+                    class="category-progress-grid"
+                >
+                    <!-- Populated by public/app.js -->
+                </div>
+            </section>
+
+            <!-- Deadline analytics -->
+
+            <section
+                class="deadline-overview"
+                aria-labelledby="deadline-heading"
+            >
+                <div class="section-title-row">
+                    <div>
+                        <p class="eyebrow">DEADLINE TRACKER</p>
+
+                        <h2 id="deadline-heading">Deadline overview</h2>
+
+                        <p class="muted">
+                            Monitor unfinished tasks and stay ahead of
+                            your deadlines.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="deadline-grid">
+                    <article class="deadline-card deadline-overdue">
+                        <p>Overdue</p>
+
+                        <p
+                            id="deadline-overdue-count"
+                            class="stat-number"
+                        >
+                            0
+                        </p>
+
+                        <span>Past their due date</span>
+                    </article>
+
+                    <article class="deadline-card deadline-today">
+                        <p>Due today</p>
+
+                        <p
+                            id="deadline-today-count"
+                            class="stat-number"
+                        >
+                            0
+                        </p>
+
+                        <span>Need attention today</span>
+                    </article>
+
+                    <article class="deadline-card deadline-upcoming">
+                        <p>Coming up</p>
+
+                        <p
+                            id="deadline-upcoming-count"
+                            class="stat-number"
+                        >
+                            0
+                        </p>
+
+                        <span>Due in the next 7 days</span>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Upcoming tasks -->
+
+            <section
+                class="upcoming-tasks-section"
+                aria-labelledby="upcoming-tasks-heading"
+            >
+                <div class="section-title-row">
+                    <p class="eyebrow">PLAN AHEAD</p>
+
+                    <h2 id="upcoming-tasks-heading">Upcoming Tasks</h2>
+
+                    <p class="muted">
+                        Your next five unfinished tasks due within seven days.
+                    </p>
+                </div>
+
+                <div
+                    id="upcoming-task-list"
+                    class="upcoming-task-list"
+                    aria-live="polite"
+                >
+                    <p class="muted">
+                        Your upcoming tasks will appear here.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Task creation and task list -->
+
+            <section class="panel task-panel" id="workspace-tasks">
+                <div class="section-heading">
+                    <div>
+                        <h2>Your task list</h2>
+
+                        <p class="muted">
+                            Create tasks, organize them into categories,
+                            set deadlines, and focus on what matters.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Create task form -->
+
+                <form id="task-form" class="task-form">
+                    <div class="field title-field">
+                        <label for="task-title">Task title</label>
+
+                        <input
+                            id="task-title"
+                            name="title"
+                            type="text"
+                            maxlength="200"
+                            placeholder="What needs to be done?"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="task-category">Category</label>
+
+                        <select
+                            id="task-category"
+                            name="category"
+                            required
+                        >
+                            <option value="Work">Work</option>
+                            <option value="Personal" selected>Personal</option>
+                            <option value="Study">Study</option>
+                            <option value="Shopping">Shopping</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="task-priority">Priority</label>
+
+                        <select id="task-priority" name="priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="task-due-date">Due date</label>
+
+                        <input
+                            id="task-due-date"
+                            name="due_date"
+                            type="date"
+                        >
+                    </div>
+
+                    <button
+                        class="primary add-task-button"
+                        type="submit"
+                    >
+                        + Add task
+                    </button>
+                </form>
+
+                <p
+                    id="task-message"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <!-- Search and filters -->
+
+                <div class="filter-panel">
+                    <div class="field search-field">
+                        <label for="task-search">Search tasks</label>
+
+                        <input
+                            id="task-search"
+                            type="search"
+                            placeholder="Search by title..."
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="task-category-filter">Category</label>
+
+                        <select id="task-category-filter">
+                            <option value="all">All categories</option>
+                            <option value="Work">Work</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Study">Study</option>
+                            <option value="Shopping">Shopping</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="task-filter">Show</label>
+
+                        <select id="task-filter">
+                            <option value="all">All tasks</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="high">High priority</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="task-sort">Sort by</label>
+
+                        <select id="task-sort">
+                            <option value="newest">Newest first</option>
+                            <option value="dueDate">Due date</option>
+                            <option value="priority">Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Task list -->
+
+                <div class="list-heading">
+                    <h3>Tasks</h3>
+
+                    <span
+                        id="task-list-count"
+                        class="count-pill"
+                    >
+                        0 tasks
+                    </span>
+                </div>
+
+                <ul id="task-list" class="task-list"></ul>
+
+                <p id="empty-state" class="empty-state">
+                    No tasks found. Add a task or change your filters.
+                </p>
+            </section>
+
+            <p class="footer-note">
+                TaskSpace · Your productivity, one task at a time.
+            </p>
+        </section>
+    </main>
+
+<a
+    id="advanced-forum-button"
+    href="/forum-advanced.html"
+    aria-label="Open Advanced Forum"
+    style="position:fixed!important;right:24px!important;bottom:148px!important;z-index:2147483645!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:14px 18px!important;background:#6d4aff!important;color:#fff!important;border:2px solid #c4b5fd!important;border-radius:12px!important;font-family:Arial,sans-serif!important;font-size:14px!important;font-weight:700!important;text-decoration:none!important;box-shadow:0 5px 20px rgba(0,0,0,.35)!important;cursor:pointer!important;"
+>âœ¦ Advanced Forum</a>
+<!-- TASKSPACE AI ASSISTANT -->
+<div id="taskspace-assistant" class="assistant-widget hidden">
+    <section
+        id="assistant-panel"
+        class="assistant-panel hidden"
+        aria-label="TaskSpace AI Assistant"
+    >
+        <header class="assistant-header">
+            <div class="assistant-header-info">
+                <div class="assistant-avatar" aria-hidden="true">AI</div>
+
+                <div>
+                    <h2>TaskSpace Assistant</h2>
+                    <p>Workspace helper</p>
+                </div>
+            </div>
+
+            <button
+                id="assistant-close"
+                class="assistant-close"
+                type="button"
+                aria-label="Close assistant"
+            >
+                &times;
+            </button>
+        </header>
+
+        <div
+            id="assistant-messages"
+            class="assistant-messages"
+            aria-live="polite"
+            aria-label="Assistant conversation"
+        >
+            <div class="assistant-message assistant-message-bot">
+                <p>
+                    Hello! I'm your TaskSpace assistant.
+                </p>
+
+                <p>
+                    Soon I will be able to help you organize tasks,
+                    prioritize work, and navigate your workspace.
+                </p>
+
+                <p class="assistant-message-note">
+                    AI responses will be connected in the next development step.
+                </p>
+            </div>
+        </div>
+
+        <form id="assistant-form" class="assistant-form">
+            <label class="assistant-sr-only" for="assistant-input">
+                Write a message
+            </label>
+
+            <textarea
+                id="assistant-input"
+                rows="1"
+                maxlength="2000"
+                placeholder="Ask your assistant..."
+                disabled
+            ></textarea>
+
+            <button
+                id="assistant-send"
+                type="submit"
+                disabled
+                aria-label="Send message"
+            >
+                Send
+            </button>
+        </form>
+
+        <p class="assistant-footer">
+            AI assistant · Connection coming soon
+        </p>
+    </section>
+
+    <button
+        id="assistant-toggle"
+        class="assistant-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="assistant-panel"
+    >
+        <span class="assistant-toggle-icon" aria-hidden="true">✦</span>
+        <span>AI Assistant</span>
+    </button>
+</div>
+
+</body>
+</html>
+
